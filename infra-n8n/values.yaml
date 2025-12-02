@@ -1,0 +1,63 @@
+image:
+  repository: n8nio/n8n
+  tag: "1.123.0"
+  pullPolicy: IfNotPresent
+
+main:
+  replicaCount: 1
+  deploymentStrategy:
+    type: "Recreate"
+  
+  resources:
+    requests:
+      cpu: "200m"
+      memory: "512Mi"
+    limits:
+      cpu: "1"
+      memory: "1Gi"
+
+  config:
+    db:
+      type: "sqlite"
+    n8n:
+      host: "self-n8n.webhop.me"
+      protocol: "https"
+      port: 5678
+      editor_base_url: "https://self-n8n.webhop.me"
+      webhook_url: "https://self-n8n.webhop.me"
+      secure_cookie: "true"
+      proxy_hops: 1
+      log_level: "info"
+      diagnostics_enabled: "false"
+  
+  secret:
+    n8n:
+      encryption_key: "d94bc995dc914f3bddc2b7f0813cac0b9fcdbd04162f94bd2f0c9184f16ff69e"
+  
+  persistence:
+    enabled: true
+    type: dynamic
+    storageClass: "local-path"
+    accessModes:
+      - ReadWriteOnce
+    size: 3Gi
+
+
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+    nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  hosts:
+    - host: self-n8n.webhop.me
+      paths:
+        - /
+  tls:
+    - secretName: n8n-tls
+      hosts:
+        - self-n8n.webhop.me
