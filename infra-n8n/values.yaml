@@ -7,6 +7,12 @@ main:
   replicaCount: 1
   deploymentStrategy:
     type: "Recreate"
+
+  service:
+    enabled: true
+    type: ClusterIP
+    port: 5678
+    annotations: {}
   
   resources:
     requests:
@@ -42,6 +48,23 @@ main:
       - ReadWriteOnce
     size: 3Gi
 
+  serviceAccount:
+    create: true        
+    name: ""            
+    annotations: {}     
+
+  service:
+    enabled: true
+    type: ClusterIP
+    port: 5678
+    annotations: {}
+
+  autoscaling:
+    enabled: false      
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 80
+
 
 
 ingress:
@@ -61,3 +84,9 @@ ingress:
     - secretName: n8n-tls
       hosts:
         - self-n8n.webhop.me
+
+webhook:
+  enabled: false
+
+worker:
+  enabled: false
