@@ -1,0 +1,75 @@
+# self-argocd.webhop.me
+# self-n8n.webhop.me
+
+image:
+  repository: n8nio/n8n
+  tag: "1.123.0"
+  pullPolicy: IfNotPresent
+
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+
+  hosts:
+    - host: self-n8n.webhop.me        # <-- поменяй на свой домен
+      paths:
+        - /                        # чарт сам заведёт pathType: Prefix
+
+  tls:
+    - hosts:
+        - self-n8n.webhop.me
+      secretName: n8n-tls   # имя TLS-секрета (создаст cert-manager)
+
+
+main:
+  replicaCount: 1
+
+  deploymentStrategy:
+    type: "Recreate"
+
+  config:
+    n8n:
+      host: "self-n8n.webhop.me"
+      protocol: "https"
+      port: 5678
+      editor_base_url: "https://self-n8n.webhop.me"
+      webhook_url: "https://self-n8n.webhop.me"
+      secure_cookie: "true"
+      proxy_hops: 1
+      log_level: "info"
+      diagnostics_enabled: "false"
+    db:
+      type: "sqlite"
+
+  secret:
+    n8n:
+      encryption_key: "d94bc995dc914f3bddc2b7f0813cac0b9fcdbd04162f94bd2f0c9184f16ff69e"
+
+  persistence:
+    enabled: true
+    type: dynamic
+    storageClass: "local-path"
+    accessModes:
+      - ReadWriteOnce
+    size: 3Gi
+
+  service:
+    type: ClusterIP
+    port: 5678
+
+  resources:
+    requests:
+      cpu: "200m"
+      memory: "512Mi"
+    limits:
+      cpu: "1"
+      memory: "1Gi"
+
+
+
+  
