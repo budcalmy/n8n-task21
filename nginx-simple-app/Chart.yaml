@@ -1,0 +1,6 @@
+apiVersion: v2
+name: nginx-simple-app
+description: Simple nginx app with static index.html
+type: application
+version: 0.1.0
+appVersion: "1.1"

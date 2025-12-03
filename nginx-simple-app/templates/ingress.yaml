@@ -1,0 +1,36 @@
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "nginx-simple-app.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "nginx-simple-app.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  annotations:
+{{- range $k, $v := .Values.ingress.annotations }}
+    {{ $k }}: {{ $v | quote }}
+{{- end }}
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  tls:
+{{- range .Values.ingress.tls }}
+    - secretName: {{ .secretName }}
+      hosts:
+{{- range .hosts }}
+        - {{ . | quote }}
+{{- end }}
+{{- end }}
+  rules:
+{{- range .Values.ingress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+          - path: {{ .path | default "/" }}
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "nginx-simple-app.fullname" $ }}
+                port:
+                  number: {{ $.Values.service.port }}
+{{- end }}
+{{- end }}

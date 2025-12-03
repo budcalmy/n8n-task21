@@ -1,0 +1,27 @@
+image:
+  repository: public.ecr.aws/w1p5d0f1/nginx
+  tag: "1.1"
+  pullPolicy: IfNotPresent
+
+replicaCount: 1
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  className: nginx      
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+    - host: simple-nginx.webhop.me    
+      path: /
+  tls:
+    - secretName: nginx-simple-tls
+      hosts:
+        - simple-nginx.webhop.me
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
