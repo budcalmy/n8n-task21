@@ -6,6 +6,7 @@ metadata:
     app.kubernetes.io/name: {{ include "nginx-simple-app.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
 spec:
+  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
